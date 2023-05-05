@@ -2232,7 +2232,7 @@ void GameOverKillBlocks()
 		}
 	}
 	
-	for (x = 0; x < 4; x++)
+	for (x = 0; x < 4; x++) 
 	{
 		SetFlag(cels_AB[x]->ccb_Flags, CCB_SKIP);
 		SetFlag(cels_GB[x]->ccb_Flags, CCB_SKIP);
