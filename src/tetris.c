@@ -2242,7 +2242,7 @@ void GameOverKillBlocks()
 
 	RenderGameBlocks = false;
 
-	if (QuickReset == false)
+	if (QuickReset == false) 
 	{
 		for (x = 0; x < 60 * 3; x++) // Do nothing for 5 seconds
 		{
