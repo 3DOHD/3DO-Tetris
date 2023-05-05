@@ -155,6 +155,7 @@ static BlockCoord DefaultBlockCoords[7][4] = // Relative to it's queue position
 };
 
 static bool GameOver = false;
+static bool QuickReset = false;
 static bool GameStarted = false;
 static bool OptionsMenuSelected = false;
 static bool EasterEggEnabled = false;
@@ -676,7 +677,7 @@ void DrawGamePlayScreen()
 		}
 	}
 
-	if (localShowGuides && minY > 3)
+	if (localShowGuides)
 	{
 		if (IsPaused == false && ClearingLines == false) // Guide Blocks First 2 Levels TODO Configure
 		{
@@ -818,6 +819,8 @@ void HandleInput()
 	{
 		GameOver = true;
 		GameStarted = false;
+
+		QuickReset = true;
 		
 		return;
 	}
@@ -1570,126 +1573,62 @@ void Rotate(bool counterClockwise)
 
 bool TryMoveLeft()
 {
-	int x, abx, aby;
-
-	bool collision = false;
-
-	for (x = 0; x < 4; x++) // Each Tetrimino conveniently has 4 positioned blocks
-	{
-		abx = ActiveBlock.Blocks[x].X;
-		aby = ActiveBlock.Blocks[x].Y;
-
-		if (abx <= 0) // Hit Left Wall
-		{
-			collision = true;
-
-			break;
-		}
-		else if (aby >= 0)
-		{
-			if (GamePlayBlocks[abx - 1][aby] == true) // Check for left block collision
-			{
-				collision = true;
-
-				break;
-			}
-		}
-	}
-
-	return !collision;
+	if (ActiveBlock.Blocks[0].X == 0) return false;
+	if (ActiveBlock.Blocks[1].X == 0) return false;
+	if (ActiveBlock.Blocks[2].X == 0) return false;
+	if (ActiveBlock.Blocks[3].X == 0) return false;
+	
+	if (ActiveBlock.Blocks[0].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[0].X - 1][ActiveBlock.Blocks[0].Y] == true) return false;
+	if (ActiveBlock.Blocks[1].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[1].X - 1][ActiveBlock.Blocks[1].Y] == true) return false;
+	if (ActiveBlock.Blocks[2].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[2].X - 1][ActiveBlock.Blocks[2].Y] == true) return false;
+	if (ActiveBlock.Blocks[3].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[3].X - 1][ActiveBlock.Blocks[3].Y] == true) return false;
+	
+	return true;
 }
 
 bool TryMoveRight()
 {
-	int x, abx, aby;
-
-	bool collision = false;
-
-	for (x = 0; x < 4; x++) // Each Tetrimino conveniently has 4 positioned blocks
-	{
-		abx = ActiveBlock.Blocks[x].X;
-		aby = ActiveBlock.Blocks[x].Y; 
-
-		if (abx >= 9) // Hit Right Wall
-		{
-			collision = true;
-
-			break;
-		}
-		else if (aby >= 0)
-		{
-			if (GamePlayBlocks[abx + 1][aby] == true) // Check for right block collision
-			{
-				collision = true;
-
-				break;
-			}
-		}
-	}
-
-	return !collision;
+	if (ActiveBlock.Blocks[0].X == 9) return false;
+	if (ActiveBlock.Blocks[1].X == 9) return false;
+	if (ActiveBlock.Blocks[2].X == 9) return false;
+	if (ActiveBlock.Blocks[3].X == 9) return false;
+	
+	if (ActiveBlock.Blocks[0].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[0].X + 1][ActiveBlock.Blocks[0].Y] == true) return false;
+	if (ActiveBlock.Blocks[1].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[1].X + 1][ActiveBlock.Blocks[1].Y] == true) return false;
+	if (ActiveBlock.Blocks[2].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[2].X + 1][ActiveBlock.Blocks[2].Y] == true) return false;
+	if (ActiveBlock.Blocks[3].Y >= 0 && GamePlayBlocks[ActiveBlock.Blocks[3].X + 1][ActiveBlock.Blocks[3].Y] == true) return false;
+	
+	return true;
 }
 
 bool TryMoveUp()
 {
-	int x, abx, aby;
-
-	bool collision = false;
-
-	for (x = 0; x < 4; x++) // Each Tetrimino conveniently has 4 positioned blocks
-	{
-		abx = ActiveBlock.Blocks[x].X;
-		aby = ActiveBlock.Blocks[x].Y;
-
-		if (aby <= 1) // At the top
-		{
-			collision = true;
-
-			break;
-		}
-		else 
-		{
-			if (GamePlayBlocks[abx][aby - 1] == true) // Check for next block collision
-			{
-				collision = true;
-
-				break;
-			}
-		}
-	}
-
-	return !collision;
+	if (ActiveBlock.Blocks[0].Y <= 0) return false;
+	if (ActiveBlock.Blocks[1].Y <= 0) return false;
+	if (ActiveBlock.Blocks[2].Y <= 0) return false;
+	if (ActiveBlock.Blocks[3].Y <= 0) return false;
+	
+	if (GamePlayBlocks[ActiveBlock.Blocks[0].X][ActiveBlock.Blocks[0].Y - 1] == true) return false;
+	if (GamePlayBlocks[ActiveBlock.Blocks[1].X][ActiveBlock.Blocks[1].Y - 1] == true) return false;
+	if (GamePlayBlocks[ActiveBlock.Blocks[2].X][ActiveBlock.Blocks[2].Y - 1] == true) return false;
+	if (GamePlayBlocks[ActiveBlock.Blocks[3].X][ActiveBlock.Blocks[3].Y - 1] == true) return false;
+	
+	return true;
 }
 
 bool TryMoveDown()
 {
-	int x, abx, aby;
-
-	bool collision = false;
-
-	for (x = 0; x < 4; x++) // Each Tetrimino conveniently has 4 positioned blocks
-	{
-		abx = ActiveBlock.Blocks[x].X;
-		aby = ActiveBlock.Blocks[x].Y;
-
-		if (aby >= 17) // Hit Bottom
-		{
-			collision = true;
-
-			break;
-		}
-		else if (aby >= -1) // Don't try and access a < 0 array position from GamePlayBlocks [face palm]. Change 0 to -1 to not see overlap
-		{
-			if (GamePlayBlocks[abx][aby + 1] == true) // Check for next block collision
-			{
-				collision = true;
-
-				break;
-			}
-		}
-	}
-
-	return !collision;
+	if (ActiveBlock.Blocks[0].Y == 17) return false;
+	if (ActiveBlock.Blocks[1].Y == 17) return false;
+	if (ActiveBlock.Blocks[2].Y == 17) return false;
+	if (ActiveBlock.Blocks[3].Y == 17) return false;
+	
+	if (ActiveBlock.Blocks[0].Y >= -1 && GamePlayBlocks[ActiveBlock.Blocks[0].X][ActiveBlock.Blocks[0].Y + 1] == true) return false;
+	if (ActiveBlock.Blocks[1].Y >= -1 && GamePlayBlocks[ActiveBlock.Blocks[1].X][ActiveBlock.Blocks[1].Y + 1] == true) return false;
+	if (ActiveBlock.Blocks[2].Y >= -1 && GamePlayBlocks[ActiveBlock.Blocks[2].X][ActiveBlock.Blocks[2].Y + 1] == true) return false;
+	if (ActiveBlock.Blocks[3].Y >= -1 && GamePlayBlocks[ActiveBlock.Blocks[3].X][ActiveBlock.Blocks[3].Y + 1] == true) return false;
+	
+	return true;
 }
 
 void MoveDown(bool resetGameSW)
@@ -2303,27 +2242,30 @@ void GameOverKillBlocks()
 
 	RenderGameBlocks = false;
 
-	for (x = 0; x < 60 * 5; x++) // Do nothing for 5 seconds
+	if (QuickReset == false)
 	{
-		DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_GameOver);
+		for (x = 0; x < 60 * 3; x++) // Do nothing for 5 seconds
+		{
+			DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_GameOver);
 
-		DisplayGameplayScreen();
-	}
+			DisplayGameplayScreen();
+		}
 
-	for (x = 0; x < 60 * 5; x++) // Do nothing for 1 second
-	{
-		DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Black);
-		DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Credits1);
+		for (x = 0; x < 60 * 3; x++) // Do nothing for 1 second
+		{
+			DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Black);
+			DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Credits1);
 
-		DisplayGameplayScreen();
-	}
-	
-	for (x = 0; x < 60 * 5; x++) // Do nothing for 1 second
-	{
-		DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Black);
-		DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Credits2);
+			DisplayGameplayScreen();
+		}
+		
+		for (x = 0; x < 60 * 3; x++) // Do nothing for 1 second
+		{
+			DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Black);
+			DrawCels(screen.sc_BitmapItems[ visibleScreenPage ], cel_Credits2);
 
-		DisplayGameplayScreen();
+			DisplayGameplayScreen();
+		}
 	}
 	
 	UnloadCel(cel_GameOver);
@@ -2468,6 +2410,7 @@ void InitGame()
 	CleanupTempCels();
 
 	GameOver = false;
+	QuickReset = false;
 	GameStarted = false;
 	OptionsMenuSelected = false;
 	EasterEggEnabled = false;
