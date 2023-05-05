@@ -2240,7 +2240,7 @@ void GameOverKillBlocks()
 		SetFlag(cels_NB[x]->ccb_Flags, CCB_SKIP);
 	}
 
-	RenderGameBlocks = false;
+	RenderGameBlocks = false; 
 
 	if (QuickReset == false) 
 	{
